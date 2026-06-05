@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<!--
+  UM Dark Mode Prototype v2
+  Source: Production outerHTML + style-COPo9AJN_.css + UUIF 9.2 skill
+  Corrections from DOM: EOL counter on Firewall tile, real icon class names,
+  Map/List toggle default=Map, real tenant list, real topbar icon classes,
+  SAMI nav item uses icon-typesonicbot, scope selector uses icon-user-profile
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UM Dark Mode — Design System &amp; Dashboard Prototype v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── DARK MODE TOKENS ───────────────────────────────────────────────────── */
+:root {
+  --dm-bg-page:        #0B0F1A;
+  --dm-bg-surface:     #111827;
+  --dm-bg-elevated:    #1A2235;
+  --dm-bg-overlay:     #1F2D45;
+  --dm-bg-hover:       rgba(255,93,0,0.06);
+  --dm-bg-sidebar:     #060E1D;
+  --dm-bg-header:      #0D1526;
+  --dm-bg-table-head:  #0F1A2E;
+  --dm-bg-card-hdr:    #0F1A2E;
+  --dm-border-subtle:  rgba(255,255,255,0.07);
+  --dm-border-default: rgba(255,255,255,0.12);
+  --dm-text-primary:   #E8EDF7;
+  --dm-text-secondary: #8392A9;
+  --dm-text-muted:     #4A5568;
+  --dm-text-link:      #60A5FA;
+  --dm-orange:         #FF5D00;
+  --dm-green:          #3BA200;
+  --dm-green-bg:       rgba(59,162,0,0.14);
+  --dm-yellow:         #FAA00A;
+  --dm-red:            #FF4343;
+  --dm-blue:           #0071C7;
+  --dm-blue-light:     #60A5FA;
+}
+
+/* ─── BASE ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { font-family: 'Nunito Sans', sans-serif; background: var(--dm-bg-page); color: var(--dm-text-primary); font-size: 13px; line-height: 1.4; overflow: hidden; }
+a { color: var(--dm-text-link); text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+
+/* ─── TAB BAR ────────────────────────────────────────────────────────────── */
+.tab-bar { display: flex; background: var(--dm-bg-header); border-bottom: 1px solid var(--dm-border-subtle); padding: 0 16px; position: sticky; top: 0; z-index: 200; flex-shrink: 0; }
+.tab-btn { padding: 12px 20px; font-size: 11.5px; font-weight: 700; color: var(--dm-text-muted); border: none; background: transparent; border-bottom: 2px solid transparent; cursor: pointer; text-transform: uppercase; letter-spacing: 0.6px; transition: color 0.15s, border-color 0.15s; }
+.tab-btn:hover { color: var(--dm-text-secondary); }
+.tab-btn.active { color: var(--dm-orange); border-bottom-color: var(--dm-orange); }
+
+/* ─── PAGE DISPLAY ───────────────────────────────────────────────────────── */
+.page { display: none; height: calc(100vh - 41px); }
+.page.active { display: flex; flex-direction: column; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESIGN SYSTEM PAGE
+══════════════════════════════════════════════════════════════════════════════ */
+.ds-page { flex-direction: column !important; overflow-y: auto; padding: 32px; gap: 40px; }
+.ds-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: var(--dm-text-muted); padding-bottom: 10px; border-bottom: 1px solid var(--dm-border-subtle); margin-bottom: 16px; }
+.ds-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.ds-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ds-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+.token-card { background: var(--dm-bg-elevated); border: 0.5px solid var(--dm-border-default); border-radius: 8px; padding: 12px; }
+.token-swatch { width: 100%; height: 32px; border-radius: 5px; margin-bottom: 8px; border: 0.5px solid rgba(255,255,255,0.08); }
+.token-name { font-size: 10.5px; font-weight: 700; color: var(--dm-text-primary); margin-bottom: 2px; }
+.token-hex { font-size: 10px; font-family: monospace; color: var(--dm-text-muted); }
+.token-use { font-size: 10px; color: #3A4E68; margin-top: 3px; }
+
+.mapping-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.mapping-table th { background: var(--dm-bg-overlay); color: var(--dm-text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; text-align: left; border-bottom: 0.5px solid var(--dm-border-default); font-weight: 700; }
+.mapping-table td { padding: 8px 12px; border-bottom: 0.5px solid var(--dm-border-subtle); vertical-align: middle; color: var(--dm-text-secondary); }
+.mapping-table tr:last-child td { border-bottom: none; }
+.cdot { width: 14px; height: 14px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 6px; border: 0.5px solid rgba(255,255,255,0.1); }
+code { font-size: 10.5px; background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 3px; font-family: monospace; color: var(--dm-text-secondary); }
+
+/* DS Components */
+.comp-card { background: var(--dm-bg-elevated); border: 0.5px solid var(--dm-border-default); border-radius: 10px; padding: 16px; }
+.comp-card h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--dm-text-muted); margin-bottom: 12px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10.5px; font-weight: 700; }
+.badge-green  { background: var(--dm-green-bg); color: #3BA200; }
+.badge-yellow { background: rgba(250,160,10,0.14); color: #FAA00A; }
+.badge-red    { background: rgba(255,67,67,0.14); color: #FF4343; }
+.badge-blue   { background: rgba(0,113,199,0.14); color: #60A5FA; }
+.badge-orange { background: rgba(255,93,0,0.14); color: #FF5D00; }
+.btn { border-radius: 88px; padding: 5px 16px; font-size: 12.5px; font-family: 'Nunito Sans',sans-serif; border: 1px solid; cursor: pointer; transition: all 0.15s; }
+.btn-outline { background: transparent; border-color: #5885CC; color: #5885CC; }
+.btn-outline:hover { border-color: var(--dm-orange); color: var(--dm-orange); }
+.btn-primary { background: var(--dm-orange); border-color: var(--dm-orange); color: #000; }
+.dm-input { background: var(--dm-bg-surface); border: 1px solid var(--dm-border-default); border-radius: 5px; color: var(--dm-text-primary); padding: 6px 10px; font-size: 12px; width: 100%; outline: none; font-family: 'Nunito Sans',sans-serif; }
+.dm-input:focus { border-color: var(--dm-orange); }
+.dm-progress { background: rgba(255,255,255,0.08); border-radius: 4px; height: 6px; overflow: hidden; }
+.dm-progress-fill { height: 100%; border-radius: 4px; background: var(--dm-orange); }
+.impl-note { background: var(--dm-bg-overlay); border-left: 3px solid var(--dm-orange); border-radius: 0 6px 6px 0; padding: 12px 16px; font-size: 12px; color: var(--dm-text-secondary); line-height: 1.6; }
+.impl-note strong { color: var(--dm-text-primary); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DASHBOARD PAGE — LAYOUT
+══════════════════════════════════════════════════════════════════════════════ */
+.db-page { flex-direction: row !important; overflow: hidden; }
+
+/* ── Sidebar ── */
+.db-sidebar {
+  width: 60px; background: var(--dm-bg-sidebar);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 0 10px; gap: 2px; flex-shrink: 0;
+  border-right: 1px solid var(--dm-border-subtle);
+}
+.db-logo { width: 36px; height: 36px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
+.db-logo img { width: 36px; }
+.db-nav-item {
+  width: 52px; height: 44px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: rgba(212,227,249,0.5); font-size: 19px;
+  border-radius: 7px; margin: 1px 0; position: relative; transition: color 0.15s, background 0.15s;
+}
+.db-nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(212,227,249,0.9); }
+.db-nav-item.active { color: var(--dm-orange); background: rgba(255,93,0,0.10); }
+.db-nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 9px; bottom: 9px;
+  width: 3px; border-radius: 0 2px 2px 0; background: var(--dm-orange);
+}
+/* push SAMI to bottom */
+.db-nav-spacer { flex: 1; }
+
+/* ── Main column ── */
+.db-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── Top bar ── */
+.db-topbar {
+  height: 48px; background: var(--dm-bg-header);
+  border-bottom: 1px solid var(--dm-border-subtle);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; flex-shrink: 0;
+}
+.db-breadcrumb { font-size: 13px; font-weight: 700; color: var(--dm-text-secondary); }
+.db-topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.scope-sel {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--dm-bg-elevated); border: 0.5px solid var(--dm-border-default);
+  border-radius: 6px; padding: 5px 10px; font-size: 12px;
+  color: var(--dm-text-secondary); cursor: pointer; width: 280px;
+}
+.scope-icon { font-size: 12px; color: var(--dm-text-muted); }
+.scope-divider { width: 1px; height: 14px; background: var(--dm-border-default); margin: 0 2px; }
+.scope-arrow { margin-left: auto; font-size: 10px; color: var(--dm-text-muted); }
+
+.topbar-btn {
+  width: 29px; height: 29px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; cursor: pointer; color: var(--dm-text-secondary);
+  font-size: 15px; position: relative; background: transparent; border: none;
+}
+.topbar-btn:hover { color: var(--dm-text-primary); }
+.topbar-badge {
+  position: absolute; top: 0; right: 0;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--dm-orange); color: #000;
+  font-size: 8px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--dm-bg-header);
+}
+.topbar-divider { width: 1px; height: 18px; background: var(--dm-border-default); margin: 0 2px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #001B50; border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--dm-text-primary); cursor: pointer;
+}
+.avatar-arrow { font-size: 10px; color: #001B50; transform: rotate(180deg); display: inline-block; }
+
+/* ── Scrollable content ── */
+.db-content { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.db-content::-webkit-scrollbar { width: 5px; }
+.db-content::-webkit-scrollbar-thumb { background: rgba(112,162,235,0.2); border-radius: 10px; }
+
+/* ── Generic card ── */
+.card { background: var(--dm-bg-elevated); border: 0.5px solid var(--dm-border-default); border-radius: 10px; overflow: hidden; }
+.card-hdr { background: var(--dm-bg-card-hdr); padding: 10px 14px; border-bottom: 0.5px solid var(--dm-border-subtle); display: flex; align-items: center; justify-content: space-between; }
+.card-hdr-title { font-size: 13px; font-weight: 800; color: var(--dm-text-primary); text-transform: uppercase; letter-spacing: 0.5px; }
+.card-hdr-sub { font-size: 11px; color: var(--dm-text-muted); margin-top: 2px; }
+.card-body { padding: 12px 14px; }
+
+/* ── Overview row (cards + org summary) ── */
+.overview-row { display: flex; gap: 10px; }
+.overview-cards { flex: 1; }
+
+/* Product tile grid */
+.product-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.product-tile {
+  background: var(--dm-bg-surface); border: 0.5px solid var(--dm-border-default);
+  border-radius: 8px; padding: 10px; cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  display: flex; flex-direction: column;
+}
+.product-tile:hover { border-color: var(--dm-orange); box-shadow: 0 0 0 1px rgba(255,93,0,0.18); }
+.tile-icon { font-size: 18px; margin-bottom: 5px; color: var(--dm-text-secondary); }
+.tile-name { font-size: 9px; font-weight: 700; color: var(--dm-text-muted); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; line-height: 1.35; }
+.tile-label { font-size: 10px; color: var(--dm-text-muted); margin-bottom: 1px; }
+.tile-total { font-size: 22px; font-weight: 800; color: var(--dm-blue); font-family: 'Nunito', sans-serif; line-height: 1; }
+.tile-sep { border: none; border-top: 0.5px solid var(--dm-border-subtle); margin: 7px 0; }
+.tile-attn-label { font-size: 10px; color: var(--dm-text-muted); margin-bottom: 2px; }
+.tile-attn-row { display: flex; align-items: center; gap: 5px; }
+.tile-attn-val { font-size: 14px; font-weight: 700; color: var(--dm-text-primary); }
+.tile-attn-val.warn { color: var(--dm-orange); }
+/* EOL badge row */
+.tile-eol-row { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.tile-eol-badge { font-size: 10px; font-weight: 700; color: #81607D; border: 1px solid #3A3040; border-radius: 2px; padding: 1px 5px; }
+.tile-eol-val { font-size: 13px; font-weight: 600; color: var(--dm-text-secondary); }
+.tile-divider-vert { width: 1px; height: 16px; background: var(--dm-border-default); }
+/* Learn More button */
+.learn-more-btn { margin-top: auto; padding: 3px 10px; border-radius: 88px; border: 1px solid var(--dm-border-default); background: transparent; color: var(--dm-text-secondary); font-size: 10.5px; cursor: pointer; font-family: 'Nunito Sans',sans-serif; align-self: flex-start; margin-top: 8px; }
+.learn-more-btn:hover { border-color: var(--dm-orange); color: var(--dm-orange); }
+
+/* Org summary */
+.org-summary {
+  width: 195px; flex-shrink: 0;
+  background: #001B50; border-radius: 10px;
+  border: 0.5px solid rgba(255,255,255,0.10);
+  display: flex; flex-direction: column; padding: 14px;
+}
+.org-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.6); margin-bottom: 10px; }
+.org-cat { font-size: 11.5px; color: rgba(255,255,255,0.45); margin-bottom: 1px; font-family: Roboto, 'Nunito Sans', sans-serif; font-size: 12px; letter-spacing: 0.2px; margin-top: 12px; text-transform: uppercase; }
+.org-num { font-size: 22px; font-weight: 700; color: white; font-family: 'Nunito', sans-serif; }
+.org-divider { border: none; border-top: 0.5px solid rgba(125,147,192,0.3); margin: 8px 0; }
+.org-attn-label { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 1px; }
+.org-attn-num { font-size: 20px; font-weight: 700; color: var(--dm-orange); font-family: 'Nunito', sans-serif; margin-bottom: 12px; }
+.create-tenant-btn {
+  margin-top: auto; padding: 7px; border-radius: 88px;
+  border: none; background: rgba(255,93,0,0.9); color: #000;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: 'Nunito Sans',sans-serif; text-align: center;
+}
+.create-tenant-btn:hover { background: var(--dm-orange); }
+
+/* ── Notifications section ── */
+.notif-toolbar { display: flex; align-items: center; gap: 14px; padding: 8px 14px; border-bottom: 0.5px solid var(--dm-border-subtle); flex-wrap: wrap; }
+.notif-stat-label { font-size: 10.5px; color: var(--dm-text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.notif-stat-val { font-size: 15px; font-weight: 700; }
+.notif-stat-val.orange { color: var(--dm-orange); }
+.notif-stat-val.blue   { color: var(--dm-blue-light); }
+.notif-stat-val.plain  { color: var(--dm-text-primary); }
+.notif-time-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--dm-bg-elevated); border: 0.5px solid var(--dm-border-default);
+  border-radius: 16px; padding: 4px 12px; font-size: 11px;
+  color: var(--dm-text-secondary); cursor: pointer;
+}
+.notif-toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.notif-icon-btn { font-size: 11.5px; color: var(--dm-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 3px; background: none; border: none; }
+.notif-icon-btn:hover { color: var(--dm-orange); }
+.toggle-grp { display: flex; border-bottom: 1px solid var(--dm-border-default); border-radius: 0; overflow: hidden; }
+.toggle-opt {
+  height: 27px; padding: 0 10px; font-size: 11.5px; display: flex; align-items: center; gap: 4px;
+  color: var(--dm-text-muted); cursor: pointer; border: none; background: transparent;
+  border-bottom: 2px solid transparent; font-family: 'Nunito Sans', sans-serif;
+}
+.toggle-opt.sel { color: var(--dm-orange); border-bottom-color: var(--dm-orange); font-weight: 700; }
+.toggle-opt:hover:not(.sel) { color: var(--dm-orange); }
+
+/* Map view */
+.map-view { position: relative; background: #1a2030; flex: 1; overflow: hidden; min-height: 400px; display: flex; align-items: center; justify-content: center; }
+.map-placeholder { color: var(--dm-text-muted); font-size: 12px; text-align: center; }
+.map-legend { position: absolute; right: 12px; top: 12px; background: var(--dm-bg-elevated); border-radius: 5px; padding: 8px 12px; font-size: 11px; color: var(--dm-text-secondary); }
+.map-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+.map-zoom { position: absolute; left: 10px; top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.map-zoom-btn { width: 28px; height: 28px; background: var(--dm-bg-elevated); border: 0.5px solid var(--dm-border-default); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; color: var(--dm-text-secondary); }
+
+/* Notification table (list view — hidden by default) */
+.notif-table-wrap { overflow-x: auto; display: none; }
+.notif-table { width: 100%; border-collapse: collapse; font-size: 11.5px; min-width: 900px; }
+.notif-table th { background: var(--dm-bg-table-head); color: var(--dm-text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; padding: 8px 12px; text-align: left; border-bottom: 0.5px solid var(--dm-border-default); white-space: nowrap; }
+.notif-table td { padding: 9px 12px; border-bottom: 0.5px solid var(--dm-border-subtle); color: var(--dm-text-primary); vertical-align: middle; white-space: nowrap; }
+.notif-table tr:last-child td { border-bottom: none; }
+.notif-table tbody tr:hover td { background: var(--dm-bg-hover); }
+.priority-warn { color: var(--dm-yellow); font-weight: 600; }
+.priority-info { color: var(--dm-blue-light); }
+.priority-notice { color: var(--dm-text-secondary); }
+.msg-col { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.state-sel { background: var(--dm-bg-surface); border: 0.5px solid var(--dm-border-default); border-radius: 4px; color: var(--dm-text-secondary); padding: 3px 6px; font-size: 11px; font-family: 'Nunito Sans',sans-serif; }
+.export-btn { font-size: 11.5px; color: var(--dm-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 3px; background: none; border: none; white-space: nowrap; }
+.export-btn:hover { color: var(--dm-orange); }
+
+/* Product tabs in notifications */
+.notif-tabs { display: flex; padding: 0 14px; border-bottom: 0.5px solid var(--dm-border-subtle); }
+.notif-tab { padding: 9px 14px; font-size: 11.5px; color: var(--dm-text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+.notif-tab:hover { color: var(--dm-orange); }
+.notif-tab.active { color: var(--dm-orange); border-bottom-color: var(--dm-orange); font-weight: 700; }
+
+/* Bulk update */
+.bulk-row { position: absolute; right: 14px; top: 5px; z-index: 1; display: flex; flex-direction: column; align-items: flex-end; }
+
+/* Footer */
+.db-footer { padding: 7px 16px; border-top: 0.5px solid var(--dm-border-subtle); font-size: 11px; color: var(--dm-text-muted); display: flex; justify-content: space-between; flex-shrink: 0; }
+.db-footer a { color: var(--dm-text-muted); }
+.db-footer a:hover { color: var(--dm-blue-light); }
+
+/* Pendo badge simulation */
+.pendo-badge { position: absolute; right: 72px; top: 12px; width: 22px; height: 22px; cursor: pointer; }
+
+/* SAMI FAB */
+.sami-fab {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--dm-orange), #CC4A00);
+  border: none; color: white; font-size: 22px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 4px 14px rgba(255,93,0,0.35);
+  transition: transform 0.2s; z-index: 100; font-family: 'Nunito', sans-serif;
+}
+.sami-fab:hover { transform: scale(1.07); }
+
+/* SW icon font emulation — use unicode chars as fallback */
+.sw-icon-char { font-style: normal; font-size: inherit; }
+</style>
+</head>
+<body>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="showPage('ds',this)">Design System</button>
+  <button class="tab-btn" onclick="showPage('db',this)">Dashboard — Dark Mode</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PAGE 1 · DESIGN SYSTEM
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="page-ds" class="page active ds-page">
+
+  <section>
+    <div class="ds-section-label">Token mapping — production light → dark</div>
+    <table class="mapping-table">
+      <thead><tr><th>Role</th><th>Production light</th><th></th><th>Dark token</th></tr></thead>
+      <tbody>
+        <tr><td>Page bg</td><td><span class="cdot" style="background:#f2f5fb"></span>#F2F5FB</td><td>→</td><td><span class="cdot" style="background:#0B0F1A"></span><code>--dm-bg-page</code> #0B0F1A</td></tr>
+        <tr><td>Card / panel surface</td><td><span class="cdot" style="background:#fff"></span>#FFFFFF</td><td>→</td><td><span class="cdot" style="background:#1A2235"></span><code>--dm-bg-elevated</code> #1A2235</td></tr>
+        <tr><td>Top header bar</td><td><span class="cdot" style="background:#fff"></span>#FFFFFF</td><td>→</td><td><span class="cdot" style="background:#0D1526"></span><code>--dm-bg-header</code> #0D1526</td></tr>
+        <tr><td>Left sidebar (.sw-nav--dark--v2)</td><td><span class="cdot" style="background:#001B50"></span>#001B50 (navy)</td><td>→</td><td><span class="cdot" style="background:#060E1D"></span><code>--dm-bg-sidebar</code> #060E1D</td></tr>
+        <tr><td>Table / card header (.sw-table-header)</td><td><span class="cdot" style="background:#d4e3f9"></span>#D4E3F9</td><td>→</td><td><span class="cdot" style="background:#0F1A2E"></span><code>--dm-bg-table-head</code> #0F1A2E</td></tr>
+        <tr><td>Dropdown / overlay</td><td><span class="cdot" style="background:#f2f5fb"></span>#F2F5FB</td><td>→</td><td><span class="cdot" style="background:#1F2D45"></span><code>--dm-bg-overlay</code> #1F2D45</td></tr>
+        <tr><td>Body text primary</td><td><span class="cdot" style="background:#001B50"></span>#001B50</td><td>→</td><td><span class="cdot" style="background:#E8EDF7"></span><code>--dm-text-primary</code> #E8EDF7</td></tr>
+        <tr><td>Body text secondary</td><td><span class="cdot" style="background:#5a6b8d"></span>#5A6B8D</td><td>→</td><td><span class="cdot" style="background:#8392A9"></span><code>--dm-text-secondary</code> #8392A9</td></tr>
+        <tr><td>Border default</td><td><span class="cdot" style="background:#c4d1e5"></span>#C4D1E5</td><td>→</td><td><span class="cdot" style="background:#1e2d44"></span>rgba(255,255,255,0.12)</td></tr>
+        <tr><td>Row hover (.sw-table-row:hover bg)</td><td><span class="cdot" style="background:#ffeade"></span>#FFEADE</td><td>→</td><td><span class="cdot" style="background:#1a0e08"></span>rgba(255,93,0,0.06)</td></tr>
+        <tr><td>Orange accent (unchanged)</td><td><span class="cdot" style="background:#FF5D00"></span>#FF5D00</td><td>→</td><td><span class="cdot" style="background:#FF5D00"></span>#FF5D00 unchanged</td></tr>
+        <tr><td>Total alert number / link (.sw-ftr-icon__colored)</td><td><span class="cdot" style="background:#0071c7"></span>#0071C7</td><td>→</td><td><span class="cdot" style="background:#60A5FA"></span>#60A5FA (blue-300)</td></tr>
+        <tr><td>Org summary card (.msp-tenant-summary__active-card)</td><td><span class="cdot" style="background:#001B50"></span>#001B50 — kept</td><td>→</td><td><span class="cdot" style="background:#001B50"></span>#001B50 (kept — already dark)</td></tr>
+        <tr><td>Scrollbar thumb (::-webkit-scrollbar-thumb)</td><td><span class="cdot" style="background:#d4e3f9"></span>#D4E3F9</td><td>→</td><td><span class="cdot" style="background:#203050"></span>rgba(112,162,235,0.20)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <div class="ds-section-label">Surface hierarchy — 5 levels</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+      <div class="token-card" style="background:#0B0F1A"><div class="token-swatch" style="background:#0B0F1A"></div><div class="token-name">Base</div><div class="token-hex">#0B0F1A</div><div class="token-use">Page bg</div></div>
+      <div class="token-card" style="background:#111827"><div class="token-swatch" style="background:#111827"></div><div class="token-name">Surface</div><div class="token-hex">#111827</div><div class="token-use">Product tiles</div></div>
+      <div class="token-card" style="background:#1A2235"><div class="token-swatch" style="background:#1A2235"></div><div class="token-name">Elevated</div><div class="token-hex">#1A2235</div><div class="token-use">Cards, panels</div></div>
+      <div class="token-card" style="background:#1F2D45"><div class="token-swatch" style="background:#1F2D45"></div><div class="token-name">Overlay</div><div class="token-hex">#1F2D45</div><div class="token-use">Dropdowns, overlays</div></div>
+      <div class="token-card" style="background:#243352"><div class="token-swatch" style="background:#243352"></div><div class="token-name">Hover fill</div><div class="token-hex">#243352</div><div class="token-use">Table row hover</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="ds-section-label">Implementation path</div>
+    <div class="impl-note">
+      <strong>Single CSS override block.</strong> Apply <code>[data-theme="dark"]</code> to <code>&lt;html&gt;</code>. Define <code>--dm-*</code> vars under that selector. The production stylesheet already has <code>--dark</code> modifier classes wired on all components — override their hardcoded hex values with these variables. Add to <code>localStorage</code> and apply before first paint to avoid FOUC. Estimated override file: ~120 lines. No JS framework changes required given the qiankun micro-frontend boundary.<br><br>
+      <strong>Icon font.</strong> All nav icons use <code>SonicWallIconFont</code> via <code>.sw-font-icon</code>. Classes confirmed from production DOM: <code>icon-cybage-dashboard</code>, <code>icon-cybage-inventory</code>, <code>icon-cybage-admin-settings</code>, <code>icon-cybage-firewalls</code>, <code>icon-cybage-switch-access-points</code>, <code>icon-cybage-capture-client</code>, <code>icon-cybage-capture-client-MDR</code>, <code>icon-cybage-theron</code>, <code>icon-typecloud-secure-edge</code>, <code>icon-typesonicbot</code> (SAMI). Product tile icons: <code>icon-firewall</code>, <code>icon-typecloud-secure-edge</code>, <code>icon-service-wireless</code>, <code>icon-SW-Switch</code>, <code>icon-cybage-capture-client</code>, <code>icon-cybage-capture-client-MDR</code>, <code>icon-cybage-sma-1000</code>.
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PAGE 2 · DASHBOARD — DARK MODE
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="page-db" class="page db-page">
+
+  <!-- ── Left sidebar ── -->
+  <aside class="db-sidebar">
+    <!-- Logo symbol -->
+    <div class="db-logo">
+      <svg viewBox="0 0 44 44" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="22" fill="#060E1D"/>
+        <path d="M14 22 C14 16.5 17.5 13 22 13 C26.5 13 30 16.5 30 22 C30 27.5 26.5 31 22 31 C17.5 31 14 27.5 14 22Z" stroke="#FF5D00" stroke-width="2.2" fill="none"/>
+        <path d="M19 28 C17 24 19 17 24 15 C21 20 22 27 27 29 C23 31 19.5 30 19 28Z" fill="#FF5D00"/>
+      </svg>
+    </div>
+    <!-- Dashboard (active) -->
+    <div class="db-nav-item active" title="Dashboard">⊞</div>
+    <!-- Inventory -->
+    <div class="db-nav-item" title="Inventory">☰</div>
+    <!-- Admin Settings -->
+    <div class="db-nav-item" title="Admin Settings">⚙</div>
+    <!-- Firewalls -->
+    <div class="db-nav-item" title="Firewalls">🛡</div>
+    <!-- Access Points & Switches -->
+    <div class="db-nav-item" title="Access Points &amp; Switches">📡</div>
+    <!-- Capture Client -->
+    <div class="db-nav-item" title="Capture Client">🖥</div>
+    <!-- Capture Client MDR -->
+    <div class="db-nav-item" title="Capture Client MDR">🔒</div>
+    <!-- Endpoint Security (Theron) -->
+    <div class="db-nav-item" title="Endpoint Security">🔐</div>
+    <!-- Cloud Secure Edge -->
+    <div class="db-nav-item" title="Cloud Secure Edge">☁</div>
+    <div class="db-nav-spacer"></div>
+    <!-- SAMI (icon-typesonicbot) — bottom -->
+    <div class="db-nav-item" title="Ask SAMI" style="color:var(--dm-orange)">✦</div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="db-main">
+
+    <!-- Top bar -->
+    <header class="db-topbar">
+      <div class="db-breadcrumb">Dashboard</div>
+      <div class="db-topbar-right">
+        <!-- Scope selector -->
+        <div class="scope-sel">
+          <span class="scope-icon">🔍</span>
+          <span class="scope-divider"></span>
+          <span class="scope-icon">👤</span>
+          <span style="color:var(--dm-text-secondary);font-size:12.5px;margin-left:4px">All MSP/Tenants (Global)</span>
+          <span class="scope-arrow">▾</span>
+        </div>
+        <!-- Bell (icon-bell), badge=0 -->
+        <button class="topbar-btn" title="Notifications">
+          🔔
+          <span class="topbar-badge">0</span>
+        </button>
+        <!-- Service (icon-service) -->
+        <button class="topbar-btn" title="Service">🔧</button>
+        <!-- Help (icon-help1) -->
+        <button class="topbar-btn" title="Help">❓</button>
+        <!-- Divider (icon-minus rotated 90°) -->
+        <span class="topbar-divider"></span>
+        <!-- Avatar PM + dropdown arrow -->
+        <div class="avatar" title="Account">PM</div>
+        <span style="color:var(--dm-text-secondary);font-size:11px;cursor:pointer">▾</span>
+      </div>
+    </header>
+
+    <!-- Scrollable content -->
+    <main class="db-content">
+
+      <!-- Overview row -->
+      <div class="overview-row">
+        <!-- Product tiles card -->
+        <div class="overview-cards">
+          <div class="card">
+            <div class="card-hdr">
+              <div>
+                <div class="card-hdr-title">Overview</div>
+                <div class="card-hdr-sub">Active Product</div>
+              </div>
+              <div style="display:flex;gap:4px">
+                <button style="background:var(--dm-bg-surface);border:0.5px solid var(--dm-border-default);border-radius:4px;padding:3px 8px;color:var(--dm-text-muted);font-size:12px;cursor:pointer">‹</button>
+                <button style="background:var(--dm-bg-surface);border:0.5px solid var(--dm-border-default);border-radius:4px;padding:3px 8px;color:var(--dm-text-secondary);font-size:12px;cursor:pointer">›</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="product-grid">
+
+                <!-- FIREWALL — EOL counter (from production DOM) -->
+                <div class="product-tile">
+                  <div class="tile-icon">🛡</div>
+                  <div class="tile-name">Firewall</div>
+                  <div class="tile-label">Total Devices</div>
+                  <div class="tile-total">81</div>
+                  <div class="tile-sep"></div>
+                  <div class="tile-attn-label">Need Attention</div>
+                  <div class="tile-eol-row">
+                    <span style="font-size:16px;color:var(--dm-blue)">⚠</span>
+                    <div class="tile-attn-val">0</div>
+                    <div class="tile-divider-vert"></div>
+                    <span class="tile-eol-badge">EOL</span>
+                    <div class="tile-eol-val">44</div>
+                  </div>
+                </div>
+
+                <!-- CLOUD SECURE EDGE -->
+                <div class="product-tile">
+                  <div class="tile-icon">☁</div>
+                  <div class="tile-name">Cloud Secure Edge</div>
+                  <div class="tile-label">Total Active Licenses</div>
+                  <div class="tile-total">70</div>
+                  <div class="tile-sep"></div>
+                  <button class="learn-more-btn">Learn More</button>
+                </div>
+
+                <!-- ACCESS POINT -->
+                <div class="product-tile">
+                  <div class="tile-icon">📡</div>
+                  <div class="tile-name">Access Point</div>
+                  <div class="tile-label">Total Devices</div>
+                  <div class="tile-total">25</div>
+                  <div class="tile-sep"></div>
+                  <div class="tile-attn-label">Need Attention</div>
+                  <div class="tile-attn-row"><div class="tile-attn-val">0</div></div>
+                </div>
+
+                <!-- SWITCH -->
+                <div class="product-tile">
+                  <div class="tile-icon">🔀</div>
+                  <div class="tile-name">Switch</div>
+                  <div class="tile-label">Total Devices</div>
+                  <div class="tile-total">9</div>
+                  <div class="tile-sep"></div>
+                  <div class="tile-attn-label">Need Attention</div>
+                  <div class="tile-attn-row"><div class="tile-attn-val">0</div></div>
+                </div>
+
+                <!-- CAPTURE CLIENT -->
+                <div class="product-tile">
+                  <div class="tile-icon">🖥</div>
+                  <div class="tile-name">Capture Client</div>
+                  <div class="tile-label">Total Endpoints</div>
+                  <div class="tile-total">375</div>
+                  <div class="tile-sep"></div>
+                  <div class="tile-attn-label">Need Attention</div>
+                  <div class="tile-attn-row"><div class="tile-attn-val warn">1</div></div>
+                </div>
+
+                <!-- CC MDR -->
+                <div class="product-tile">
+                  <div class="tile-icon">🔒</div>
+                  <div class="tile-name">Capture Client MDR</div>
+                  <div class="tile-label">Total Endpoints</div>
+                  <div class="tile-total">0</div>
+                  <div class="tile-sep"></div>
+                  <button class="learn-more-btn">Learn More</button>
+                </div>
+
+                <!-- SMA 1000 -->
+                <div class="product-tile">
+                  <div class="tile-icon">🔑</div>
+                  <div class="tile-name">SMA 1000</div>
+                  <div class="tile-label">Total Devices</div>
+                  <div class="tile-total">0</div>
+                  <div class="tile-sep"></div>
+                  <button class="learn-more-btn">Learn More</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Org Summary (.msp-tenant-summary__active-card) -->
+        <div class="org-summary">
+          <div class="org-title">Org Summary</div>
+          <div class="org-cat">Tenants</div>
+          <div class="org-num">23</div>
+          <div class="org-divider"></div>
+          <div class="org-attn-label">Need Attention</div>
+          <div class="org-attn-num">1</div>
+          <button class="create-tenant-btn">Create Tenant</button>
+        </div>
+      </div>
+
+      <!-- Notifications section (.notification-section) -->
+      <div class="card" style="display:flex;flex-direction:column;">
+        <div class="card-hdr">
+          <div>
+            <div class="card-hdr-title">Notifications</div>
+            <div class="card-hdr-sub">Notifications for Product Alerts</div>
+          </div>
+        </div>
+
+        <!-- Dashboard alerts toolbar (.dashboard-alerts) -->
+        <div class="notif-toolbar">
+          <!-- Filter icon -->
+          <button class="notif-icon-btn" title="Filter">▼ Filter</button>
+          <!-- Alert counts -->
+          <div style="display:flex;align-items:center;gap:14px">
+            <div><div class="notif-stat-label">TOTAL</div><div class="notif-stat-val orange">2</div></div>
+            <div><div class="notif-stat-label">SECURITY</div><div class="notif-stat-val blue">0</div></div>
+            <div><div class="notif-stat-label">SYSTEM</div><div class="notif-stat-val blue">2</div></div>
+            <div><div class="notif-stat-label">LICENSE</div><div class="notif-stat-val plain">0</div></div>
+          </div>
+          <!-- Time pill -->
+          <div class="notif-time-pill">24 Hours ▾</div>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--dm-text-secondary);cursor:pointer">
+            <input type="radio" name="custom" style="accent-color:var(--dm-orange)"> Custom
+          </label>
+          <!-- Right actions -->
+          <div class="notif-toolbar-right">
+            <button class="notif-icon-btn" title="Refresh" onclick="refreshNotif()">↻ Refresh</button>
+            <!-- Map/List toggle (.sw-group-toggle) — Map selected by default -->
+            <div class="toggle-grp">
+              <button class="toggle-opt sel" id="toggle-map" onclick="showMapView()">▦ Map</button>
+              <button class="toggle-opt" id="toggle-list" onclick="showListView()">☰ List</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product tabs -->
+        <div class="notif-tabs">
+          <div class="notif-tab active">Firewalls</div>
+          <div class="notif-tab">Access Points</div>
+          <div class="notif-tab">Switches</div>
+          <div class="notif-tab">Capture Client</div>
+          <div class="notif-tab">CC MDR</div>
+        </div>
+
+        <!-- Map view (default) -->
+        <div class="map-view" id="map-view" style="height:420px">
+          <!-- Simulated world map tiles (dark) -->
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,#14202e 0%,#0d1522 40%,#0a1118 100%);opacity:0.92"></div>
+          <!-- Simplified continent outlines via a dark-tinted SVG pattern -->
+          <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.18" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice">
+            <!-- North America -->
+            <path d="M120 100 L200 80 L260 90 L280 140 L270 200 L230 240 L180 250 L150 220 L110 180 Z" fill="#60A5FA" stroke="none"/>
+            <!-- South America -->
+            <path d="M200 270 L250 260 L280 300 L270 380 L230 420 L200 400 L180 350 L190 300 Z" fill="#60A5FA" stroke="none"/>
+            <!-- Europe -->
+            <path d="M420 80 L500 70 L530 100 L520 150 L480 160 L440 150 L410 120 Z" fill="#60A5FA" stroke="none"/>
+            <!-- Africa -->
+            <path d="M430 180 L510 170 L540 220 L530 330 L490 370 L450 350 L420 280 L415 210 Z" fill="#60A5FA" stroke="none"/>
+            <!-- Asia -->
+            <path d="M540 60 L750 50 L820 90 L830 180 L780 220 L700 230 L620 200 L560 180 L530 130 Z" fill="#60A5FA" stroke="none"/>
+            <!-- Australia -->
+            <path d="M700 300 L790 290 L820 340 L800 390 L740 400 L700 370 L690 330 Z" fill="#60A5FA" stroke="none"/>
+          </svg>
+          <!-- Marker (India region — Fw_9073 at 49.249.49.243) -->
+          <div style="position:absolute;left:62%;top:55%;transform:translate(-50%,-50%)">
+            <span style="color:#e33939;font-size:20px">●</span>
+          </div>
+          <!-- Legend -->
+          <div class="map-legend">
+            <div><span class="map-dot" style="background:#e33939"></span> Emergency/Critical</div>
+            <div style="margin-top:4px"><span class="map-dot" style="background:#feaa5c"></span> Alert/Error/Warning</div>
+            <div style="margin-top:4px"><span class="map-dot" style="background:#0071c7"></span> Notice/Info/Debug</div>
+          </div>
+          <!-- Zoom controls -->
+          <div class="map-zoom">
+            <div class="map-zoom-btn" title="Home">⌂</div>
+            <div class="map-zoom-btn" title="Zoom in">+</div>
+            <div class="map-zoom-btn" title="Zoom out">−</div>
+          </div>
+        </div>
+
+        <!-- List view (hidden by default) -->
+        <div class="notif-table-wrap" id="list-view">
+          <table class="notif-table">
+            <thead>
+              <tr>
+                <th style="width:32px"><input type="checkbox" style="accent-color:var(--dm-orange)"></th>
+                <th>Local Time</th>
+                <th>Message</th>
+                <th>Priority</th>
+                <th>Tenant</th>
+                <th>Alert State</th>
+                <th>Source IP</th>
+                <th>Type</th>
+                <th>Friendly Name</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><input type="checkbox" style="accent-color:var(--dm-orange)"></td><td style="color:var(--dm-text-secondary);font-family:monospace;font-size:11px">18 Mar 2026 04:34:02</td><td class="msg-col">Commit applied successfully.</td><td class="priority-info">Info</td><td style="color:var(--dm-text-secondary)">A-DEMO-TENANT</td><td><select class="state-sel"><option>New</option></select></td><td style="color:var(--dm-text-muted)">N/A</td><td style="color:var(--dm-text-secondary)">Commit Status</td><td style="color:var(--dm-text-secondary)">Cloud Management</td><td style="color:var(--dm-text-muted)">SYSTEM</td></tr>
+              <tr><td><input type="checkbox" style="accent-color:var(--dm-orange)"></td><td style="color:var(--dm-text-secondary);font-family:monospace;font-size:11px">18 Mar 2026 03:13:50</td><td class="msg-col">Commit applied successfully.</td><td class="priority-info">Info</td><td style="color:var(--dm-text-secondary)">A-DEMO-TENANT</td><td><select class="state-sel"><option>New</option></select></td><td style="color:var(--dm-text-muted)">N/A</td><td style="color:var(--dm-text-secondary)">Commit Status</td><td style="color:var(--dm-text-secondary)">Cloud Management</td><td style="color:var(--dm-text-muted)">SYSTEM</td></tr>
+              <tr><td><input type="checkbox" style="accent-color:var(--dm-orange)"></td><td style="color:var(--dm-text-secondary);font-family:monospace;font-size:11px">17 Mar 2026 04:12:05</td><td class="msg-col">Connection to Device Fw_9073 is successful</td><td class="priority-notice">Notice</td><td style="color:var(--dm-text-secondary)">A-DEMO-TENANT</td><td><select class="state-sel"><option>New</option></select></td><td style="color:var(--dm-text-muted);font-family:monospace;font-size:11px">49.249.49.243:9</td><td style="color:var(--dm-text-secondary)">Health Status</td><td style="color:var(--dm-text-secondary)">Fw_9073</td><td style="color:var(--dm-text-muted)">SYSTEM</td></tr>
+              <tr><td><input type="checkbox" style="accent-color:var(--dm-orange)"></td><td style="color:var(--dm-text-secondary);font-family:monospace;font-size:11px">17 Mar 2026 03:40:12</td><td class="msg-col">Connection to Device Fw_9073 failed</td><td class="priority-warn">Warning</td><td style="color:var(--dm-text-secondary)">A-DEMO-TENANT</td><td><select class="state-sel"><option>New</option></select></td><td style="color:var(--dm-text-muted);font-family:monospace;font-size:11px">49.249.49.243:9</td><td style="color:var(--dm-text-secondary)">Health Status</td><td style="color:var(--dm-text-secondary)">Fw_9073</td><td style="color:var(--dm-text-muted)">SYSTEM</td></tr>
+              <tr><td><input type="checkbox" style="accent-color:var(--dm-orange)"></td><td style="color:var(--dm-text-secondary);font-family:monospace;font-size:11px">17 Mar 2026 03:24:05</td><td class="msg-col">Connection to Device Fw_9073 is successful</td><td class="priority-notice">Notice</td><td style="color:var(--dm-text-secondary)">A-DEMO-TENANT</td><td><select class="state-sel"><option>New</option></select></td><td style="color:var(--dm-text-muted);font-family:monospace;font-size:11px">49.249.49.243:9</td><td style="color:var(--dm-text-secondary)">Health Status</td><td style="color:var(--dm-text-secondary)">Fw_9073</td><td style="color:var(--dm-text-muted)">SYSTEM</td></tr>
+              <tr><td><input type="checkbox" style="accent-color:var(--dm-orange)"></td><td style="color:var(--dm-text-secondary);font-family:monospace;font-size:11px">17 Mar 2026 03:08:12</td><td class="msg-col">Connection to Device Fw_9073 failed</td><td class="priority-warn">Warning</td><td style="color:var(--dm-text-secondary)">A-DEMO-TENANT</td><td><select class="state-sel"><option>New</option></select></td><td style="color:var(--dm-text-muted);font-family:monospace;font-size:11px">49.249.49.243:9</td><td style="color:var(--dm-text-secondary)">Health Status</td><td style="color:var(--dm-text-secondary)">Fw_9073</td><td style="color:var(--dm-text-muted)">SYSTEM</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /notif card -->
+
+    </main><!-- /db-content -->
+
+    <!-- Footer -->
+    <footer class="db-footer">
+      <span>Copyright SonicWall</span>
+      <span><a href="#">Legal</a> · <a href="#">Privacy</a></span>
+    </footer>
+  </div><!-- /db-main -->
+
+  <!-- SAMI FAB (bottom-right, icon-typesonicbot) -->
+  <button class="sami-fab" title="Ask SAMI">S</button>
+
+</div><!-- /dashboard page -->
+
+<script>
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showMapView() {
+  document.getElementById('map-view').style.display = 'flex';
+  document.getElementById('list-view').style.display = 'none';
+  document.getElementById('toggle-map').classList.add('sel');
+  document.getElementById('toggle-list').classList.remove('sel');
+}
+
+function showListView() {
+  document.getElementById('map-view').style.display = 'none';
+  document.getElementById('list-view').style.display = 'block';
+  document.getElementById('toggle-list').classList.add('sel');
+  document.getElementById('toggle-map').classList.remove('sel');
+}
+
+function refreshNotif() {
+  const btn = document.querySelector('[onclick="refreshNotif()"]');
+  btn.textContent = '↻ Refreshing…';
+  setTimeout(() => { btn.textContent = '↻ Refresh'; }, 1200);
+}
+
+// Tab switching on notif tabs
+document.querySelectorAll('.notif-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.notif-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
