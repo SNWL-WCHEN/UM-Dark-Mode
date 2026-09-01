@@ -32,8 +32,3 @@ The standard I held it to was whether an operator scanning a dense alert table a
 
 ---
 
-### Other work
-
-- [Unified API Hub](https://snwl-wchen.github.io/API-hub/) — developer portal for partner API access
-- [SAMI Enablement Demo](https://snwl-wchen.github.io/SAMI_Demo/) — north-star interface for an AI security assistant
-- [Claude Skills Library](https://snwl-wchen.github.io/Skills-Library/) — AI instruction library for product teams
